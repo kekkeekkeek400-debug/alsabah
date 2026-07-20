@@ -61,7 +61,10 @@ io.on('connection', (socket) => {
                     '--no-first-run',
                     '--no-zygote',
                     '--single-process',
-                    '--disable-gpu'
+                    '--disable-gpu',
+                    '--js-flags="--max-old-space-size=250"',
+                    '--disable-web-security',
+                    '--disable-features=IsolateOrigins,site-per-process'
                 ]
             }
         });

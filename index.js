@@ -88,10 +88,11 @@ io.on('connection', (socket) => {
         whatsappClient.on('message', async msg => {
             if (msg.isGroupMsg || msg.isStatus) return;
 
-            const userText = msg.body;
+            const userText = msg.body || '[رسالة غير نصية]';
             const userId = msg.from;
 
             console.log(`📩 رسالة جديدة من ${userId}: ${userText}`);
+            socket.emit('message', `📩 رسالة استلمتها من ${userId.split('@')[0]}: ${userText}`);
 
             if (!chatMemory.has(userId)) {
                 chatMemory.set(userId, [
@@ -108,7 +109,7 @@ io.on('connection', (socket) => {
 
                 const chatCompletion = await groq.chat.completions.create({
                     messages: history,
-                    model: "llama3-70b-8192",
+                    model: "llama3-8b-8192",
                     temperature: 0.2,
                 });
 
@@ -120,10 +121,13 @@ io.on('connection', (socket) => {
 
                 await chat.clearState();
                 msg.reply(replyText);
+                
                 console.log(`🤖 الرد: ${replyText}`);
+                socket.emit('message', `🤖 البوت رد: ${replyText}`);
 
             } catch (error) {
                 console.error('❌ خطأ في الذكاء الاصطناعي:', error.message);
+                socket.emit('message', `❌ خطأ داخلي: ${error.message}`);
                 msg.reply('عذراً، أواجه صعوبة في التركيز حالياً.');
             }
         });

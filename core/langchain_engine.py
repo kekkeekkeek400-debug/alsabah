@@ -12,8 +12,11 @@ from core.proactive_engine import schedule_proactive_followup
 from langchain.tools import Tool
 import os
 
-# محرك التفكير الأساسي أصبح الآن Groq (Llama-3-70B) للسرعة الفائقة والمجانية
-llm = ChatGroq(model="llama3-70b-8192", temperature=0.2)
+groq_key = os.environ.get("GROQ_API_KEY")
+if not groq_key:
+    print("❌ مصيبة: مفتاح GROQ_API_KEY غير موجود في إعدادات البيئة!")
+    
+llm = ChatGroq(model_name="llama3-70b-8192", temperature=0.2, groq_api_key=groq_key)
 
 data_tool = Tool(
     name="DataAnalyzer",

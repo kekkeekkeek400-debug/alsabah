@@ -3,17 +3,13 @@ LangChain Orchestrator V5 (Powered by Groq LPU ⚡)
 يدعم التصفح الحي، وتحليل العاطفة، والمتابعة الاستباقية بسرعة الضوء وبدون تكلفة!
 """
 
-# pyrefly: ignore [missing-import]
-from langchain_groq import ChatGroq
-# pyrefly: ignore [missing-import]
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-# pyrefly: ignore [missing-import]
+from langchain.agents import AgentExecutor, create_structured_chat_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from tools.data_analyzer import analyze_company_data
 from tools.web_search import search_live_internet
 from core.proactive_engine import schedule_proactive_followup
-# pyrefly: ignore [missing-import]
 from langchain.tools import Tool
+from langchain_groq import ChatGroq
 import os
 
 groq_key = os.environ.get("GROQ_API_KEY", "dummy_key_to_prevent_crash")
@@ -38,6 +34,19 @@ system_msg = """{system_prompt}
 1. استخدم 'WebSurfer' دائماً لأي سؤال عن أسعار صرف الدولار، أو أخبار اليوم. لا تقم بالرد من ذاكرتك القديمة في هذه الأمور أبداً.
 2. استخدم 'DataAnalyzer' إذا سأل العميل عن توفر بضاعة في متجرنا.
 3. كن ودوداً جداً وقدم حلولاً ذكية تليق بمبيعات احترافية.
+
+يجب أن تقوم بالرد عبر استدعاء الأدوات التالية (يجب أن تستخدم JSON):
+{tools}
+
+قائمة أسماء الأدوات المتاحة: {tool_names}
+
+للرد، يجب عليك دائماً استخدام الهيكل التالي من JSON:
+```json
+{{
+  "action": "اسم الأداة (يجب أن يكون واحد من {tool_names} أو Final Answer)",
+  "action_input": "مدخلات الأداة"
+}}
+```
 """
 
 prompt = ChatPromptTemplate.from_messages([
@@ -47,7 +56,7 @@ prompt = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name="agent_scratchpad"),
 ])
 
-agent = create_tool_calling_agent(llm, tools, prompt)
+agent = create_structured_chat_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # 🧠 مسجل العاطفة (Sentiment Logger)

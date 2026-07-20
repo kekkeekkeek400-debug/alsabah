@@ -3,19 +3,20 @@ LangChain Orchestrator V5 (Powered by Groq LPU ⚡)
 يدعم التصفح الحي، وتحليل العاطفة، والمتابعة الاستباقية بسرعة الضوء وبدون تكلفة!
 """
 
+# pyrefly: ignore [missing-import]
 from langchain_groq import ChatGroq
+# pyrefly: ignore [missing-import]
 from langchain.agents import AgentExecutor, create_structured_chat_agent
+# pyrefly: ignore [missing-import]
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from tools.data_analyzer import analyze_company_data
 from tools.web_search import search_live_internet
 from core.proactive_engine import schedule_proactive_followup
+# pyrefly: ignore [missing-import]
 from langchain.tools import Tool
 import os
 
-groq_key = os.environ.get("GROQ_API_KEY")
-if not groq_key:
-    print("❌ مصيبة: مفتاح GROQ_API_KEY غير موجود في إعدادات البيئة!")
-    
+groq_key = os.environ.get("GROQ_API_KEY", "dummy_key_to_prevent_crash")
 llm = ChatGroq(model_name="llama3-70b-8192", temperature=0.2, groq_api_key=groq_key)
 
 data_tool = Tool(
@@ -62,6 +63,9 @@ def log_sentiment(user_id: str, message: str, ai_response: str):
         f.write(log_entry)
 
 async def process_with_agents(message: str, history: list, user_id: str, system_prompt: str = "أنت مساعد ذكي.") -> str:
+    if groq_key == "dummy_key_to_prevent_crash":
+        return "⚠️ عذراً، لم تقم بوضع مفتاح GROQ_API_KEY في إعدادات Render بشكل صحيح، أو أنك نسيت حفظ التغييرات. يرجى العودة لموقع Render وإضافته."
+
     response = await agent_executor.ainvoke({
         "system_prompt": system_prompt,
         "input": message,

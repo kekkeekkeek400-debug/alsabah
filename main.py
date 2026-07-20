@@ -27,6 +27,7 @@ class MessagePayload(BaseModel):
     message: str
     chat_history: list = []
     need_voice: bool = False
+    system_prompt: str = "أنت مساعد ذكي."
 
 class VisionPayload(BaseModel):
     user_id: str
@@ -46,7 +47,8 @@ async def deep_think(payload: MessagePayload):
         raw_response = await process_with_agents(
             message=payload.message, 
             history=payload.chat_history,
-            user_id=payload.user_id
+            user_id=payload.user_id,
+            system_prompt=payload.system_prompt
         )
         
         # 2. النقد الذاتي (Self-Healing Critic)

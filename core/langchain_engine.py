@@ -29,7 +29,7 @@ web_tool = Tool(
 
 tools = [data_tool, web_tool]
 
-system_msg = """أنت العقل المدبر V5.
+system_msg = """{system_prompt}
 تعليماتك الصارمة:
 1. استخدم 'WebSurfer' دائماً لأي سؤال عن أسعار صرف الدولار، أو أخبار اليوم. لا تقم بالرد من ذاكرتك القديمة في هذه الأمور أبداً.
 2. استخدم 'DataAnalyzer' إذا سأل العميل عن توفر بضاعة في متجرنا.
@@ -58,8 +58,9 @@ def log_sentiment(user_id: str, message: str, ai_response: str):
     with open("sentiment_analytics.log", "a", encoding="utf-8") as f:
         f.write(log_entry)
 
-async def process_with_agents(message: str, history: list, user_id: str) -> str:
+async def process_with_agents(message: str, history: list, user_id: str, system_prompt: str = "أنت مساعد ذكي.") -> str:
     response = await agent_executor.ainvoke({
+        "system_prompt": system_prompt,
         "input": message,
         "chat_history": history
     })

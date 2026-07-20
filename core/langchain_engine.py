@@ -6,7 +6,7 @@ LangChain Orchestrator V5 (Powered by Groq LPU ⚡)
 # pyrefly: ignore [missing-import]
 from langchain_groq import ChatGroq
 # pyrefly: ignore [missing-import]
-from langchain.agents import AgentExecutor, create_structured_chat_agent
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 # pyrefly: ignore [missing-import]
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from tools.data_analyzer import analyze_company_data
@@ -47,7 +47,7 @@ prompt = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name="agent_scratchpad"),
 ])
 
-agent = create_structured_chat_agent(llm, tools, prompt)
+agent = create_tool_calling_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # 🧠 مسجل العاطفة (Sentiment Logger)
